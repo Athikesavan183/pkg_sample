@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Digital Transformation Partner</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+body{
+  background:#f5f7fb;
+  color:#1a1a1a;
+}
+
+/* ─── NAVBAR ─────────────────────────────────────────── */
+header{
+  background:#0b1b33;
+  padding:18px 60px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  position:sticky;
+  top:0;
+  z-index:1000;
+}
+.logo{
+  color:#fff;
+  font-size:20px;
+  font-weight:600;
+  letter-spacing:1px;
+}
+
+nav{
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+nav > a{
+  color:#fff;
+  padding:8px 14px;
+  text-decoration:none;
+  font-size:14px;
+  opacity:0.9;
+  border-radius:4px;
+  transition:0.2s;
+}
+
+nav > a:hover{
+  color:#00d4ff;
+  opacity:1;
+}
+
+/* ─── TOP-LEVEL DROPDOWN TRIGGER ─────────────────────── */
+.nav-dropdown{
+  position:relative;
+}
+
+.nav-dropdown > .nav-btn{
+  color:#fff;
+  padding:8px 14px;
+  font-size:14px;
+  opacity:0.9;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  border-radius:4px;
+  transition:0.2s;
+  user-select:none;
+}
+
+.nav-dropdown > .nav-btn::after{
+  content:"▾";
+  font-size:11px;
+}
+
+.nav-dropdown > .nav-btn.open{
+  color:#00d4ff;
+  opacity:1;
+}
+
+/* ─── STAGE 1: plain link list (no white box) ────────── */
+.simple-list{
+  display:none;
+  position:absolute;
+  top:calc(100% + 10px);
+  left:0;
+  z-index:999;
+  flex-direction:column;
+  gap:2px;
+  min-width:220px;
+  background:#fff;
+  border-radius:10px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.15);
+  padding:8px 0;
+  transform-origin: top center;
+  animation: none;
+}
+.simple-list.open{
+  display:flex;
+  animation: unfoldDown 0.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+@keyframes unfoldDown {
+  0%   { opacity:0; transform: scaleY(0.6) translateY(-10px); }
+  100% { opacity:1; transform: scaleY(1)   translateY(0); }
+}
+
+.simple-list-item{
+  color:#0b1b33;
+  font-size:14px;
+  padding:9px 18px;
+  cursor:pointer;
+  border-radius:4px;
+  opacity:1;
+  transition:background 0.15s, color 0.15s;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  user-select:none;
+}
+.simple-list-item:hover{ background:#f2f6ff; color:#0057ff; }
+.simple-list-item .sl-arrow{ font-size:11px; opacity:0.5; }
+
+/* ─── STAGE 2: full mega menu (white box) ────────────── */
+.mega-dropdown{
+  display:none;
+  position:absolute;
+  top:calc(100% + 10px);
+  left:0;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.18);
+  min-width:680px;
+  overflow:hidden;
+  z-index:999;
+}
+.mega-dropdown.open{
+  display:flex;
+  transform-origin: top side;
+  animation: unfoldDown 0.25s cubic-bezier(0.22, 0, 0.36, 0) forwards;
+}
+
+/* LEFT PANEL — service list */
+.mega-left{
+  width:260px;
+  padding:12px 0;
+  border-right:1px solid #f0f0f0;
+  flex-shrink:0;
+}
+
+.mega-left a,
+.mega-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:11px 18px;
+  font-size:13.5px;
+  color:#1a1a2e;
+  text-decoration:none;
+  cursor:pointer;
+  transition:background 0.15s, color 0.15s;
+  gap:10px;
+}
+
+.mega-item .icon{
+  width:22px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#888;
+  font-size:15px;
+  flex-shrink:0;
+}
+
+.mega-item .label{
+  flex:1;
+}
+
+.mega-item .arrow{
+  color:#bbb;
+  font-size:11px;
+}
+
+.mega-item:hover,
+.mega-item.active{
+  background:#f2f6ff;
+  color:#0057ff;
+}
+
+.mega-item:hover .icon,
+.mega-item.active .icon{
+  color:#0057ff;
+}
+
+.mega-item:hover .arrow,
+.mega-item.active .arrow{
+  color:#0057ff;
+}
+
+/* RIGHT PANEL — sub items */
+.mega-right{
+  flex:1;
+  padding:20px 24px;
+  display:none;           /* hidden by default */
+  flex-direction:column;
+}
+
+.mega-right.visible{
+  display:flex;
+}
+
+.mega-right-label{
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:1.2px;
+  color:#888;
+  text-transform:uppercase;
+  margin-bottom:14px;
+}
+
+.sub-item{
+  display:flex;
+  align-items:center;
+  padding:11px 14px;
+  border-radius:8px;
+  color:#1a1a2e;
+  text-decoration:none;
+  font-size:13.5px;
+  margin-bottom:6px;
+  border:1px solid #e8ecf4;
+  background:#fff;
+  transition:0.15s;
+  gap:10px;
+}
+
+.sub-item:hover{
+  background:#f0f5ff;
+  border-color:#c0d0ff;
+  color:#0057ff;
+}
+
+.sub-item .s-icon{
+  font-size:17px;
+  width:26px;
+  text-align:center;
+  flex-shrink:0;
+}
+
+.sub-item .s-text strong{
+  display:block;
+  font-size:13px;
+  font-weight:600;
+}
+
+.sub-item .s-text span{
+  font-size:11.5px;
+  color:#888;
+}
+
+
+/* ─── SIMPLE DROPDOWN (for other nav items) ──────────── */
+.simple-dropdown{
+  display:none;
+  position:absolute;
+  top:calc(100% + 10px);
+  left:0;
+  background:#fff;
+  border-radius:8px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.14);
+  min-width:200px;
+  padding:8px 0;
+  z-index:999;
+}
+
+.nav-dropdown:hover .simple-dropdown{
+  display:block;
+}
+
+.simple-dropdown a{
+  display:block;
+  padding:10px 16px;
+  font-size:13px;
+  color:#0b1b33;
+  text-decoration:none;
+}
+
+.simple-dropdown a:hover{
+  background:#f2f6ff;
+  color:#00a8ff;
+}
+
+
+/* ─── HERO ───────────────────────────────────────────── */
+.hero{
+    position:relative;
+    overflow:hidden;
+
+    height:85vh;
+
+    background:
+    linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.55)),
+    url('https://images.unsplash.com/photo-1551836022-d5d88e9218df')
+    center/cover;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+
+    color:white;
+    padding:20px;
+
+    animation:hero 15s linear infinite alternate;
+}
+
+/* Animated Gradient Overlay */
+
+.hero::before{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    background:linear-gradient(
+      120deg,
+      rgba(0,0,0,.75),
+      rgba(0,102,255,.25),
+      rgba(0,0,0,.75)
+    );
+
+    background-size:200% 200%;
+
+    animation:gradientMove 8s ease infinite;
+
+    z-index:1;
+}
+
+/* Content above overlay */
+
+.hero h1,
+.hero p,
+.hero button{
+    position:relative;
+    z-index:2;
+}
+
+/* Hero Title Animation */
+
+.hero h1{
+    font-size:52px;
+    max-width:900px;
+
+    opacity:0;
+    transform:translateY(60px);
+
+    animation:fadeUp 1s ease forwards;
+}
+
+/* Paragraph Animation */
+
+.hero p{
+    margin-top:15px;
+    max-width:700px;
+    font-size:18px;
+    opacity:0;
+
+    transform:translateY(60px);
+
+    animation:fadeUp 2s ease forwards;
+    animation-delay:0.3s;
+}
+
+/* Button Animation */
+
+.hero button{
+    margin-top:25px;
+
+    padding:12px 28px;
+    border:none;
+
+    background:#00d4ff;
+    color:#000;
+
+    font-weight:600;
+    border-radius:6px;
+    cursor:pointer;
+
+    opacity:0;
+
+    animation:
+      fadeUp 2s ease forwards,
+      floatBtn 2s ease-in-out infinite;
+
+    animation-delay:
+      0.6s,
+      1.6s;
+}
+
+/* Background Zoom */
+
+@keyframes heroZoom{
+    from{
+        background-size:100%;
+    }
+    to{
+        background-size:110%;
+    }
+}
+
+/* Gradient Movement */
+
+@keyframes gradientMove{
+    0%{
+        background-position:0% 50%;
+    }
+
+    50%{
+        background-position:100% 50%;
+    }
+
+    100%{
+        background-position:0% 50%;
+    }
+}
+
+/* Fade Up */
+
+@keyframes fadeUp{
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
+}
+
+/* Floating Button */
+
+@keyframes floatBtn{
+
+    0%,100%{
+        transform:translateY(0);
+    }
+
+    50%{
+        transform:translateY(-8px);
+    }
+}
+.scroll-indicator{
+    position:absolute;
+
+    bottom:30px;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    color:white;
+    font-size:35px;
+
+    z-index:2;
+
+    animation:bounce 2s infinite;
+}
+
+@keyframes bounce{
+
+    0%,100%{
+        transform:translate(-50%,0);
+    }
+
+    50%{
+        transform:translate(-50%,10px);
+    }
+}
+
+/* ─── STATS ──────────────────────────────────────────── */
+.stats{
+  display:flex; justify-content:center; gap:80px;
+  padding:60px 20px; background:#fff;
+}
+.stat{ text-align:center; }
+.stat h2{ font-size:28px; color:#0b1b33; }
+
+/* ─── SECTION TITLE ──────────────────────────────────── */
+.section-title{ text-align:center; margin:60px 0 30px; font-size:28px; }
+
+/* ─── SOLUTIONS GRID ─────────────────────────────────── */
+.grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; padding:0 60px; }
+.card{ background:#fff; padding:25px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.08); transition:0.3s; }
+.card:hover{ transform:translateY(-6px); }
+.card h3{ margin-bottom:10px; color:#0b1b33; }
+
+/* ─── PARTNERS ───────────────────────────────────────── */
+.partners{ background:#fff; margin-top:60px; padding:50px; text-align:center; }
+.partner-logos{ display:flex; flex-wrap:wrap; justify-content:center; gap:25px; margin-top:20px; }
+.partner-logos img{ height:40px; filter:grayscale(100%); opacity:0.7; }
+
+/* ─── INSIGHTS ───────────────────────────────────────── */
+.insights{ padding:60px; }
+.insight-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px; }
+.insight{ background:#fff; padding:20px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.08); }
+
+/* ─── CSR ────────────────────────────────────────────── */
+.csr{ background:#0b1b33; color:white; padding:60px; text-align:center; }
+
+/* ─── CONTACT ────────────────────────────────────────── */
+.contact{ padding:60px; background:#fff; }
+.contact form{ max-width:600px; margin:auto; display:grid; gap:12px; }
+input, textarea{ padding:12px; border:1px solid #ddd; border-radius:6px; }
+button.submit{ background:#0b1b33; color:white; padding:12px; border:none; cursor:pointer; }
+
+/* ─── FOOTER ─────────────────────────────────────────── */
+footer{ background:#081427; color:white; text-align:center; padding:25px; }
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    <img src="pk1.png" height="100" width="200" alt="PKG Groups">
+  </div>
+
+  <nav>
+
+  <!-- ════ WHAT WE DO — TWO STAGE DROPDOWN ════ -->
+  <div class="nav-dropdown" id="whatwedo-dropdown">
+      <div class="nav-btn" id="whatwedo-btn">What We Do</div>
+
+      
+  <div class="simple-list" id="whatwedo-simplelist">
+        <div class="simple-list-item" onmouseover="openMega('panel-allservices','trigger-allservices')">All Services <span class="sl-arrow">▸</span></div>
+        <div class="simple-list-item" onmouseover="openMega('panel-exports','trigger-exports')">PKG Exports <span class="sl-arrow">▸</span></div>
+        <div class="simple-list-item" onmouseover="openMega('panel-events','trigger-events')">PKG Events <span class="sl-arrow">▸</span></div>
+        <div class="simple-list-item" onmouseover="openMega('panel-services','trigger-services')">IT Services <span class="sl-arrow">▸</span></div>
+        <div class="simple-list-item" onmouseover="openMega('panel-marketing','trigger-marketing')">Marketing <span class="sl-arrow">▸</span></div>
+        <div class="simple-list-item" onmouseover="openMega('panel-cloud','trigger-cloud')">Cloud Solutions <span class="sl-arrow">▸</span></div>
+        <div class="simple-list-item" onmouseover="openMega('panel-analytics','trigger-analytics')">Business Analytics <span class="sl-arrow">▸</span></div>
+        <div class="simple-list-item" onmouseover="openMega('panel-erp','trigger-erp')">ERP <span class="sl-arrow">▸</span></div>
+  </div>
+
+   <!-- STAGE 2: full mega menu with white background -->
+  <div class="mega-dropdown" id="whatwedo-mega">
+
+        <!-- LEFT: service list -->
+  <div class="mega-left">
+
+  <div class="mega-item" id="trigger-allservices"
+        onmouseenter="onItemHover('panel-allservices','trigger-allservices')">          
+  <span class="label">All Services</span>
+  <span class="arrow">▸</span>
+  </div>
+
+  <div class="mega-item" id="trigger-exports"
+        onmouseenter="onItemHover('panel-exports','trigger-exports')">
+  <span class="label">PKG Exports</span>
+  <span class="arrow">▸</span>
+  </div>
+
+          <div class="mega-item" id="trigger-events"
+              onmouseenter="onItemHover('panel-events','trigger-events')">
+            
+            <span class="label" >PKG Events</span>
+            <span class="arrow">▸</span>
+          </div>
+
+          <div class="mega-item" id="trigger-services"
+               onmouseenter="onItemHover('panel-services','trigger-services')">
+            
+            <span class="label">IT Services</span>
+            <span class="arrow">▸</span>
+          </div>
+
+          <div class="mega-item" id="trigger-Networking"
+               onmouseenter="onItemHover('panel-marketing','trigger-Networking')">
+            
+            <span class="label">Marketing</span>
+            <span class="arrow">▸</span>
+          </div>
+
+          <div class="mega-item" id="trigger-cloud"
+               onmouseenter="onItemHover('panel-cloud','trigger-cloud')">
+           
+            <span class="label">Cloud Solutions</span>
+            <span class="arrow">▸</span>
+          </div>
+
+          <div class="mega-item" id="trigger-analytics"
+               onmouseenter="onItemHover('panel-analytics','trigger-analytics')">
+           
+            <span class="label">Business Analytics</span>
+            <span class="arrow">▸</span>
+          </div>
+
+          <div class="mega-item" id="trigger-erp"
+
+               onmouseenter="onItemHover('panel-erp','trigger-erp')">
+            
+            <span class="label">ERP</span>
+            <span class="arrow">▸</span>
+          </div>
+
+        </div><!-- /mega-left -->
+
+        <!-- RIGHT: panels -->
+
+      
+
+        <!-- PKG exports panel -->
+        <div class="mega-right" id="panel-exports">
+          <div class="mega-right-label">PKG Exports</div>
+          <a href="#" class="sub-item">
+            <span class="s-icon">🌐</span>
+            <span class="s-text"><strong>Premium Materials</strong><span>Custom-grade design</span></span>
+          </a>
+          <a href="#" class="sub-item">
+            <span class="s-icon">🏢</span>
+            <span class="s-text"><strong>Professional Services</strong><span>Expert support for your business needs</span></span>
+          </a>
+        </div>
+
+        <!-- PKG Events panel -->
+        <div class="mega-right" id="panel-events">
+          <div class="mega-right-label">PKG Events</div>
+          <a href="https://pkggroups.com/corporate-events/" class="sub-item">
+            <span class="s-icon">🧑‍💼</span>
+            <span class="s-text"><strong>Corporate Events</strong><span>Where Work Feels Like Wow.🎶</span></span>
+          </a>
+          <a href="https://pkggroups.com/social-events/" class="sub-item">
+            <span class="s-icon">🧑‍💼</span>
+            <span class="s-text"><strong>Social Events</strong><span>The Social Spark You’ve Been Waiting For👑</span></span>
+          </a>
+          <a href="https://pkggroups.com/wedding-events/" class="sub-item">
+            <span class="s-icon">🧑‍💼</span>
+            <span class="s-text"><strong>Wedding Events</strong><span>Forever Starts Here💕</span></span>
+          </a>
+        </div>
+
+       <!--- IT Services panel -->
+        <div class="mega-right" id="panel-services">
+          <div class="mega-right-label">IT Services</div>
+          <a href="#" class="sub-item">
+            <span class="s-icon">📋</span>
+            <span class="s-text"><strong>Website Development</strong><span>Build modern, responsive websites</span></span>
+          </a>
+          <a href="#" class="sub-item">
+            <span class="s-icon">📋</span>
+            <span class="s-text"><strong>App Development</strong><span>Build powerful, scalable applications</span></span>
+          </a>
+          <a href="#" class="sub-item">
+            <span class="s-icon">📋</span>
+            <span class="s-text"><strong>Website Maintenance</strong><span>Keep your site up-to-date and secure</span></span>
+          </a>
+        </div>
+
+        <!-- Marketing panel -->
+        <div class="mega-right" id="panel-marketing">
+          <div class="mega-right-label">Cyber Security</div>
+          <a href="#" class="sub-item">
+            <span class="s-icon">🔍</span>
+            <span class="s-text"><strong>SOC</strong><span>Security Operations Center</span></span>
+          </a>
+          <a href="#" class="sub-item">
+            <span class="s-icon">🔐</span>
+            <span class="s-text"><strong>Pen Testing</strong><span>Identify and fix vulnerabilities</span></span>
+          </a>
+        </div>
+
+        <!-- CLOUD panel -->
+        <div class="mega-right" id="panel-cloud">
+          <div class="mega-right-label">Cloud Solutions</div>
+          <a href="#" class="sub-item">
+            <span class="s-icon">⚡</span>
+            <span class="s-text"><strong>Cloud Migration</strong><span>Move workloads with zero downtime</span></span>
+          </a>
+          <a href="#" class="sub-item">
+            <span class="s-icon">☁</span>
+            <span class="s-text"><strong>Cloud Management</strong><span>Ongoing cloud ops and optimization</span></span>
+          </a>
+        </div>
+
+        <!-- ANALYTICS panel -->
+        <div class="mega-right" id="panel-analytics">
+          <div class="mega-right-label">Business Analytics</div>
+          <a href="#" class="sub-item">
+            <span class="s-icon">🤖</span>
+            <span class="s-text"><strong>AI &amp; ML Insights</strong><span>Data-driven decision making</span></span>
+          </a>
+          <a href="#" class="sub-item">
+            <span class="s-icon">📈</span>
+            <span class="s-text"><strong>BI Dashboards</strong><span>Real-time business intelligence</span></span>
+          </a>
+        </div>
+
+        <!-- ERP panel -->
+        <div class="mega-right" id="panel-erp">
+          <div class="mega-right-label">ERP &amp; Business Applications</div>
+          <a href="#" class="sub-item">
+            <span class="s-icon">🔗</span>
+            <span class="s-text"><strong>ERP Implementation</strong><span>Streamline enterprise workflows</span></span>
+          </a>
+        </div>
+
+      </div><!-- /mega-dropdown -->
+    </div>
+    <!-- ═══════════════════════════════════════════════ -->
+
+    <a href="https://pkggroups.com/industries/">Industries</a>
+    <a href="https://pkggroups.com/about-us/">Who We Are</a>
+    <a href="https://pkggroups.com/careers/">Careers</a>
+    <a href="https://pkggroups.com/insights/">Insights</a>
+    <a href="https://pkggroups.com/contact/">Contact Us</a>
+
+  </nav>
+</header>
+
+
+<!-- ─── REST OF PAGE (unchanged) ──────────────────────── -->
+
+<section class="hero">
+  <h1>Partnering in Your Digital Transformation Journey</h1>
+  <p>We deliver infrastructure, cloud, security, analytics, and managed IT services to help enterprises scale faster and smarter.</p>
+  <button>Explore Solutions</button>
+  <div class="scroll-indicator">⌄</div>
+</section>
+
+<section class="stats">
+  <div class="stat"><h2>5000+</h2><p>Employees</p></div>
+  <div class="stat"><h2>750+</h2><p>Locations</p></div>
+  <div class="stat"><h2>2500+</h2><p>Customers</p></div>
+  <div class="stat"><h2>38+</h2><p>Years</p></div>
+</section>
+
+<h2 class="section-title">Our Solutions</h2>
+
+<section class="grid">
+  <div class="card"><h3>Infrastructure Services</h3><p>Scalable IT infrastructure for enterprises.</p></div>
+  <div class="card"><h3>Cloud Solutions</h3><p>Secure and flexible cloud migration.</p></div>
+  <div class="card"><h3>Cyber Security</h3><p>Protect networks, data, and identity.</p></div>
+  <div class="card"><h3>Business Analytics</h3><p>AI-driven insights for smarter decisions.</p></div>
+  <div class="card"><h3>Managed Services</h3><p>End-to-end IT operations support.</p></div>
+  <div class="card"><h3>ERP Solutions</h3><p>Streamline enterprise workflows.</p></div>
+</section>
+
+<section class="partners">
+  <h2>Our Partners</h2>
+  <div class="partner-logos">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg" alt="IBM">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/4/4f/Cisco_logo.svg" alt="Cisco">
+  </div>
+</section>
+
+<section class="insights">
+  <h2 class="section-title">Insights &amp; Trends</h2>
+  <div class="insight-grid">
+    <div class="insight">AIOps transforming enterprise IT operations</div>
+    <div class="insight">Cloud migration strategies for 2026</div>
+    <div class="insight">Cybersecurity challenges in hybrid environments</div>
+  </div>
+</section>
+
+<section class="csr">
+  <h2>CSR &amp; Sustainability</h2>
+  <p>We believe in using technology for positive impact, empowering communities and building a sustainable future.</p>
+</section>
+
+<section class="contact">
+  <h2 class="section-title">Get in Touch</h2>
+  <form>
+    <input type="text" placeholder="Name">
+    <input type="email" placeholder="Email">
+    <input type="text" placeholder="Company">
+    <textarea rows="4" placeholder="Message"></textarea>
+    <button class="submit">Send Message</button>
+  </form>
+</section>
+
+<footer>
+  © 2026 PKG Groups | Digital Transformation Partner
+</footer>
+
+
+<script>
+  const allTriggers = [
+    'trigger-allservices','trigger-exports','trigger-events','trigger-services','trigger-Networking',
+    'trigger-marketing','trigger-cloud',
+    'trigger-analytics','trigger-erp'
+  ];
+  const allPanels = [
+    'panel-allservices','panel-exports','panel-events','panel-services','panel-Networking',
+    'panel-marketing','panel-cloud',
+    'panel-analytics','panel-erp'
+  ];
+
+  const whatwedoBtn    = document.getElementById('whatwedo-btn');
+  const simpleList     = document.getElementById('whatwedo-simplelist');
+  const megaMenu       = document.getElementById('whatwedo-mega');
+  const dropdownWrap   = document.getElementById('whatwedo-dropdown');
+
+  // ── helpers ──
+  function hideAllPanels(){
+    allPanels.forEach(id => document.getElementById(id)?.classList.remove('visible'));
+    allTriggers.forEach(id => document.getElementById(id)?.classList.remove('active'));
+  }
+
+
+  function showPanel(panelId, triggerId){
+    hideAllPanels();
+    document.getElementById(panelId)?.classList.add('visible');
+    document.getElementById(triggerId)?.classList.add('active');
+  }
+
+  function closeEverything(){
+    simpleList.classList.remove('open');
+    megaMenu.classList.remove('open');
+    whatwedoBtn.classList.remove('open');
+    hideAllPanels();
+  }
+
+  // ── Stage 1: click "What We Do" → show plain list only ──
+  whatwedoBtn.addEventListener('mouseenter', (e) => {
+    e.stopPropagation();
+    const listOpen = simpleList.classList.contains('open');
+    const megaOpen = megaMenu.classList.contains('open');
+
+    if(listOpen || megaOpen){
+      closeEverything();
+    } else {
+      // show plain list, hide mega
+      simpleList.classList.add('open');
+      megaMenu.classList.remove('open');
+      whatwedoBtn.classList.add('open');
+      hideAllPanels();
+    }
+  });
+
+  // ── Stage 2: click a plain list item → hide list, show mega with that panel ──
+  window.openMega = function(panelId, triggerId){
+    simpleList.classList.remove('open');   // hide plain list
+    megaMenu.classList.add('open');        // show white mega box
+    showPanel(panelId, triggerId);         // show correct right panel
+  };
+
+  // ── Hover on left mega items (only works when mega is open) ──
+  window.onItemHover = function(panelId, triggerId){
+    if(!megaMenu.classList.contains('open')) return;
+    showPanel(panelId, triggerId);
+  };
+
+  // ── Click outside → close everything ──
+  document.addEventListener('click', (e) => {
+    if(!dropdownWrap.contains(e.target)) closeEverything();
+  });
+</script>
+
+</body>
+</html>
